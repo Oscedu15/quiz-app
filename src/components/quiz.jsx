@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Results from "./results";
 
 function Quiz() {
   const questionBank = [
@@ -28,6 +29,8 @@ function Quiz() {
   //Mantiene el índice de la pregunta actual que se está mostrando
   const [currentQuestion, setCurrentQuestion] = useState(0);
 
+  const [isQuizCompleted, setIsQuizCompleted] = useState(false);
+
   const selectedAnswer = userAnswers[currentQuestion]; // null
 
   function handleSelectOption(option) {
@@ -41,16 +44,38 @@ function Quiz() {
   }
 
   function goToNext() {
-    setCurrentQuestion(currentQuestion + 1);
+    if (currentQuestion === questionBank.length - 1) {
+      setIsQuizCompleted(true);
+    } else {
+      setCurrentQuestion(currentQuestion + 1);
+    }
   }
 
   function goToPrev() {
-    setCurrentQuestion(currentQuestion - 1);
+    if (currentQuestion < 0) {
+      setCurrentQuestion(currentQuestion - 1);
+    }
+  }
+
+  function restarQuiz() {
+    setUserAnswers(initialAnswers);
+    setCurrentQuestion(0);
+    setIsQuizCompleted(false);
+  }
+
+  if (isQuizCompleted) {
+    return (
+      <Results
+        userAnswers={userAnswers}
+        restarQuiz={restarQuiz}
+        questionBank={questionBank}
+      />
+    );
   }
 
   return (
     <div>
-      <h2>Question {currentQuestion}</h2>
+      <h2>Question {currentQuestion + 1}</h2>
       <p className="question">{questionBank[currentQuestion].question}</p>
       {questionBank[currentQuestion].options.map((option, index) => (
         <button
@@ -66,7 +91,7 @@ function Quiz() {
           Previous
         </button>
         <button onClick={() => goToNext()} disabled={!selectedAnswer}>
-          Next
+          {currentQuestion === questionBank.length - 1 ? "Finish Quiz" : "Next"}
         </button>
       </div>
     </div>
